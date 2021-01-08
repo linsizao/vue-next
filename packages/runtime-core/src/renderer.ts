@@ -422,6 +422,7 @@ function baseCreateRenderer(
     if (n1 && !isSameVNodeType(n1, n2)) {
       anchor = getNextHostNode(n1)
       unmount(n1, parentComponent, parentSuspense, true)
+      // n1 设置为 null 保证后续都走 mount 逻辑
       n1 = null
     }
 
@@ -433,12 +434,15 @@ function baseCreateRenderer(
     const { type, ref, shapeFlag } = n2
     switch (type) {
       case Text:
+        // 处理文本节点
         processText(n1, n2, container, anchor)
         break
       case Comment:
+        // 处理注释节点
         processCommentNode(n1, n2, container, anchor)
         break
       case Static:
+        // 处理静态节点
         if (n1 == null) {
           mountStaticNode(n2, container, anchor, isSVG)
         } else if (__DEV__) {
@@ -446,6 +450,7 @@ function baseCreateRenderer(
         }
         break
       case Fragment:
+        // 处理 Fragment 元素
         processFragment(
           n1,
           n2,
@@ -459,6 +464,7 @@ function baseCreateRenderer(
         break
       default:
         if (shapeFlag & ShapeFlags.ELEMENT) {
+          // 处理普通 DOM 元素
           processElement(
             n1,
             n2,
@@ -470,6 +476,7 @@ function baseCreateRenderer(
             optimized
           )
         } else if (shapeFlag & ShapeFlags.COMPONENT) {
+          // 处理组件
           processComponent(
             n1,
             n2,
@@ -1114,7 +1121,7 @@ function baseCreateRenderer(
     isSVG: boolean,
     optimized: boolean
   ) => {
-    if (n1 == null) {
+    if (n1 == null) {  // 挂载组件
       if (n2.shapeFlag & ShapeFlags.COMPONENT_KEPT_ALIVE) {
         ;(parentComponent!.ctx as KeepAliveContext).activate(
           n2,
@@ -1135,7 +1142,7 @@ function baseCreateRenderer(
         )
       }
     } else {
-      updateComponent(n1, n2, optimized)
+      updateComponent(n1, n2, optimized)  // 更新子组件
     }
   }
 
@@ -1213,7 +1220,7 @@ function baseCreateRenderer(
 
   const updateComponent = (n1: VNode, n2: VNode, optimized: boolean) => {
     const instance = (n2.component = n1.component)!
-    if (shouldUpdateComponent(n1, n2, optimized)) {
+    if (shouldUpdateComponent(n1, n2, optimized)) { // 根据新旧子组件 vnode 判断是否需要跟新子组件
       if (
         __FEATURE_SUSPENSE__ &&
         instance.asyncDep &&

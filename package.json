@@ -74,7 +74,7 @@
     "semver": "^7.3.2",
     "serve": "^11.3.0",
     "ts-jest": "^26.1.0",
-    "typescript": "^3.9.3",
+    "vue-property-decorator": "^9.0.0",
     "yorkie": "^2.0.0"
   }
 }
