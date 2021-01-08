@@ -7,7 +7,7 @@ import {
   ReactiveEffectOptions,
   isReactive
 } from '@vue/reactivity'
-import { queueJob } from './scheduler'
+import { SchedulerJob, queuePreFlushCb } from './scheduler'
 import {
   EMPTY_OBJ,
   isObject,
@@ -16,7 +16,9 @@ import {
   isString,
   hasChanged,
   NOOP,
-  remove
+  remove,
+  isMap,
+  isSet
 } from '@vue/shared'
 import {
   currentInstance,
@@ -42,13 +44,7 @@ export type WatchCallback<V = any, OV = any> = (
   onInvalidate: InvalidateCbRegistrator
 ) => any
 
-type MapSources<T> = {
-  [K in keyof T]: T[K] extends WatchSource<infer V>
-    ? V
-    : T[K] extends object ? T[K] : never
-}
-
-type MapOldSources<T, Immediate> = {
+type MapSources<T, Immediate> = {
   [K in keyof T]: T[K] extends WatchSource<infer V>
     ? Immediate extends true ? (V | undefined) : V
     : T[K] extends object
@@ -82,16 +78,27 @@ export function watchEffect(
 // initial value for watchers to trigger on undefined initial values
 const INITIAL_WATCHER_VALUE = {}
 
+type MultiWatchSources = (WatchSource<unknown> | object)[]
+
 // overload #1: array of multiple sources + cb
-// Readonly constraint helps the callback to correctly infer value types based
-// on position in the source array. Otherwise the values will get a union type
-// of all possible value types.
 export function watch<
-  T extends Readonly<Array<WatchSource<unknown> | object>>,
+  T extends MultiWatchSources,
   Immediate extends Readonly<boolean> = false
 >(
-  sources: T,
-  cb: WatchCallback<MapSources<T>, MapOldSources<T, Immediate>>,
+  sources: [...T],
+  cb: WatchCallback<MapSources<T, false>, MapSources<T, Immediate>>,
+  options?: WatchOptions<Immediate>
+): WatchStopHandle
+
+// overload #2 for multiple sources w/ `as const`
+// watch([foo, bar] as const, () => {})
+// somehow [...T] breaks when the type is readonly
+export function watch<
+  T extends Readonly<MultiWatchSources>,
+  Immediate extends Readonly<boolean> = false
+>(
+  source: T,
+  cb: WatchCallback<MapSources<T, false>, MapSources<T, Immediate>>,
   options?: WatchOptions<Immediate>
 ): WatchStopHandle
 
@@ -113,10 +120,10 @@ export function watch<
 ): WatchStopHandle
 
 // implementation
-export function watch<T = any>(
-  source: WatchSource<T> | WatchSource<T>[],
-  cb: WatchCallback<T>,
-  options?: WatchOptions
+export function watch<T = any, Immediate extends Readonly<boolean> = false>(
+  source: T | WatchSource<T>,
+  cb: any,
+  options?: WatchOptions<Immediate>
 ): WatchStopHandle {
   if (__DEV__ && !isFunction(cb)) {
     warn(
@@ -125,11 +132,11 @@ export function watch<T = any>(
         `supports \`watch(source, cb, options?) signature.`
     )
   }
-  return doWatch(source, cb, options)
+  return doWatch(source as any, cb, options)
 }
 
 function doWatch(
-  source: WatchSource | WatchSource[] | WatchEffect,
+  source: WatchSource | WatchSource[] | WatchEffect | object,
   cb: WatchCallback | null,
   { immediate, deep, flush, onTrack, onTrigger }: WatchOptions = EMPTY_OBJ,
   instance = currentInstance
@@ -159,8 +166,10 @@ function doWatch(
   }
 
   let getter: () => any
+  let forceTrigger = false
   if (isRef(source)) {
-    getter = () => source.value
+    getter = () => (source as Ref).value
+    forceTrigger = !!(source as Ref)._shallow
   } else if (isReactive(source)) {
     getter = () => source
     deep = true
@@ -232,14 +241,14 @@ function doWatch(
   }
 
   let oldValue = isArray(source) ? [] : INITIAL_WATCHER_VALUE
-  const job = () => {
+  const job: SchedulerJob = () => {
     if (!runner.active) {
       return
     }
     if (cb) {
       // watch(source, cb)
       const newValue = runner()
-      if (deep || hasChanged(newValue, oldValue)) {
+      if (deep || forceTrigger || hasChanged(newValue, oldValue)) {
         // cleanup before running cb again
         if (cleanup) {
           cleanup()
@@ -258,23 +267,26 @@ function doWatch(
     }
   }
 
-  let scheduler: (job: () => any) => void
+  // important: mark the job as a watcher callback so that scheduler knows
+  // it is allowed to self-trigger (#1727)
+  job.allowRecurse = !!cb
+
+  let scheduler: ReactiveEffectOptions['scheduler']
   if (flush === 'sync') {
     scheduler = job
-  } else if (flush === 'pre') {
-    // ensure it's queued before component updates (which have positive ids)
-    job.id = -1
+  } else if (flush === 'post') {
+    scheduler = () => queuePostRenderEffect(job, instance && instance.suspense)
+  } else {
+    // default: 'pre'
     scheduler = () => {
       if (!instance || instance.isMounted) {
-        queueJob(job)
+        queuePreFlushCb(job)
       } else {
         // with 'pre' option, the first call must happen before
         // the component is mounted so it is called synchronously.
         job()
       }
     }
-  } else {
-    scheduler = () => queuePostRenderEffect(job, instance && instance.suspense)
   }
 
   const runner = effect(getter, {
@@ -284,7 +296,7 @@ function doWatch(
     scheduler
   })
 
-  recordInstanceBoundEffect(runner)
+  recordInstanceBoundEffect(runner, instance)
 
   // initial run
   if (cb) {
@@ -293,6 +305,8 @@ function doWatch(
     } else {
       oldValue = runner()
     }
+  } else if (flush === 'post') {
+    queuePostRenderEffect(runner, instance && instance.suspense)
   } else {
     runner()
   }
@@ -309,7 +323,7 @@ function doWatch(
 export function instanceWatch(
   this: ComponentInternalInstance,
   source: string | Function,
-  cb: Function,
+  cb: WatchCallback,
   options?: WatchOptions
 ): WatchStopHandle {
   const publicThis = this.proxy as any
@@ -324,17 +338,14 @@ function traverse(value: unknown, seen: Set<unknown> = new Set()) {
     return value
   }
   seen.add(value)
-  if (isArray(value)) {
+  if (isRef(value)) {
+    traverse(value.value, seen)
+  } else if (isArray(value)) {
     for (let i = 0; i < value.length; i++) {
       traverse(value[i], seen)
     }
-  } else if (value instanceof Map) {
-    value.forEach((v, key) => {
-      // to register mutation dep for existing keys
-      traverse(value.get(key), seen)
-    })
-  } else if (value instanceof Set) {
-    value.forEach(v => {
+  } else if (isSet(value) || isMap(value)) {
+    value.forEach((v: any) => {
       traverse(v, seen)
     })
   } else {

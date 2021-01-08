@@ -1,13 +1,14 @@
 import merge from 'merge-source-map'
-import path from 'path'
 import { RawSourceMap } from 'source-map'
 import { SFCStyleCompileOptions } from './compileStyle'
+import { isFunction } from '@vue/shared'
 
 export type StylePreprocessor = (
   source: string,
   map: RawSourceMap | undefined,
   options: {
     [key: string]: any
+    additionalData?: string | ((source: string, filename: string) => string)
     filename: string
   },
   customRequire: SFCStyleCompileOptions['preprocessCustomRequire']
@@ -25,7 +26,7 @@ const scss: StylePreprocessor = (source, map, options, load = require) => {
   const nodeSass = load('sass')
   const finalOptions = {
     ...options,
-    data: source,
+    data: getSource(source, options.filename, options.additionalData),
     file: options.filename,
     outFile: options.filename,
     sourceMap: !!map
@@ -33,7 +34,6 @@ const scss: StylePreprocessor = (source, map, options, load = require) => {
 
   try {
     const result = nodeSass.renderSync(finalOptions)
-    // sass output path is position path
     const dependencies = result.stats.includedFiles
     if (map) {
       return {
@@ -68,7 +68,7 @@ const less: StylePreprocessor = (source, map, options, load = require) => {
   let result: any
   let error: Error | null = null
   nodeLess.render(
-    source,
+    getSource(source, options.filename, options.additionalData),
     { ...options, syncImport: true },
     (err: Error | null, output: any) => {
       error = err
@@ -77,11 +77,7 @@ const less: StylePreprocessor = (source, map, options, load = require) => {
   )
 
   if (error) return { code: '', errors: [error], dependencies: [] }
-  // less output path is relative path
-  const dependencies = getAbsolutePaths(
-    result.imports,
-    path.dirname(options.filename)
-  )
+  const dependencies = result.imports
   if (map) {
     return {
       code: result.css.toString(),
@@ -107,11 +103,7 @@ const styl: StylePreprocessor = (source, map, options, load = require) => {
     if (map) ref.set('sourcemap', { inline: false, comment: false })
 
     const result = ref.render()
-    // stylus output path is relative path
-    const dependencies = getAbsolutePaths(
-      ref.deps(),
-      path.dirname(options.filename)
-    )
+    const dependencies = ref.deps()
     if (map) {
       return {
         code: result,
@@ -127,6 +119,18 @@ const styl: StylePreprocessor = (source, map, options, load = require) => {
   }
 }
 
+function getSource(
+  source: string,
+  filename: string,
+  additionalData?: string | ((source: string, filename: string) => string)
+) {
+  if (!additionalData) return source
+  if (isFunction(additionalData)) {
+    return additionalData(source, filename)
+  }
+  return additionalData + source
+}
+
 export type PreprocessLang = 'less' | 'sass' | 'scss' | 'styl' | 'stylus'
 
 export const processors: Record<PreprocessLang, StylePreprocessor> = {
@@ -135,8 +139,4 @@ export const processors: Record<PreprocessLang, StylePreprocessor> = {
   scss,
   styl,
   stylus: styl
-}
-
-function getAbsolutePaths(relativePaths: string[], dirname: string): string[] {
-  return relativePaths.map(relativePath => path.join(dirname, relativePath))
 }

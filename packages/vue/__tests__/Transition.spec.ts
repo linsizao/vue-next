@@ -1,10 +1,8 @@
 import { E2E_TIMEOUT, setupPuppeteer } from './e2eUtils'
 import path from 'path'
-import { mockWarn } from '@vue/shared'
 import { h, createApp, Transition } from 'vue'
 
 describe('e2e: Transition', () => {
-  mockWarn()
   const {
     page,
     html,
@@ -61,8 +59,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'v-leave-active',
-          'v-leave-from'
+          'v-leave-from',
+          'v-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -76,8 +74,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'v-enter-active',
-          'v-enter-from'
+          'v-enter-from',
+          'v-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -117,8 +115,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -132,8 +130,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -178,8 +176,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'bye-active',
-          'bye-from'
+          'bye-from',
+          'bye-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -193,8 +191,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'hello-active',
-          'hello-from'
+          'hello-from',
+          'hello-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -237,8 +235,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -255,8 +253,8 @@ describe('e2e: Transition', () => {
         })
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'changed-enter-active',
-          'changed-enter-from'
+          'changed-enter-from',
+          'changed-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -334,8 +332,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         // todo test event with arguments. Note: not get dom, get object. '{}'
         expect(beforeLeaveSpy).toBeCalled()
@@ -355,8 +353,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         expect(beforeEnterSpy).toBeCalled()
         expect(onEnterSpy).toBeCalled()
@@ -410,8 +408,8 @@ describe('e2e: Transition', () => {
       // enter
       expect(await classWhenTransitionStart()).toStrictEqual([
         'test',
-        'test-enter-active',
-        'test-enter-from'
+        'test-enter-from',
+        'test-enter-active'
       ])
       await nextFrame()
       expect(await classList('.test')).toStrictEqual([
@@ -423,8 +421,8 @@ describe('e2e: Transition', () => {
       // cancel (leave)
       expect(await classWhenTransitionStart()).toStrictEqual([
         'test',
-        'test-leave-active',
-        'test-leave-from'
+        'test-leave-from',
+        'test-leave-active'
       ])
       expect(enterCancelledSpy).toBeCalled()
       await nextFrame()
@@ -468,8 +466,8 @@ describe('e2e: Transition', () => {
         // appear
         expect(appearClass).toStrictEqual([
           'test',
-          'test-appear-active',
-          'test-appear-from'
+          'test-appear-from',
+          'test-appear-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -483,8 +481,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -498,8 +496,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -597,8 +595,8 @@ describe('e2e: Transition', () => {
         // appear
         expect(appearClass).toStrictEqual([
           'test',
-          'test-appear-active',
-          'test-appear-from'
+          'test-appear-from',
+          'test-appear-active'
         ])
         expect(beforeAppearSpy).toBeCalled()
         expect(onAppearSpy).toBeCalled()
@@ -621,8 +619,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         expect(beforeLeaveSpy).toBeCalled()
         expect(onLeaveSpy).toBeCalled()
@@ -641,8 +639,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         expect(beforeEnterSpy).toBeCalled()
         expect(onEnterSpy).toBeCalled()
@@ -764,16 +762,16 @@ describe('e2e: Transition', () => {
 
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
-          'noop-leave-active',
-          'noop-leave-from'
+          'noop-leave-from',
+          'noop-leave-active'
         ])
         await nextFrame()
         expect(await html('#container')).toBe('<!--v-if-->')
 
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
-          'noop-enter-active',
-          'noop-enter-from'
+          'noop-enter-from',
+          'noop-enter-active'
         ])
         await nextFrame()
         expect(await html('#container')).toBe('<div class="">content</div>')
@@ -806,8 +804,8 @@ describe('e2e: Transition', () => {
 
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
-          'test-anim-leave-active',
-          'test-anim-leave-from'
+          'test-anim-leave-from',
+          'test-anim-leave-active'
         ])
         await nextFrame()
         expect(await classList('#container div')).toStrictEqual([
@@ -819,8 +817,8 @@ describe('e2e: Transition', () => {
 
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
-          'test-anim-enter-active',
-          'test-anim-enter-from'
+          'test-anim-enter-from',
+          'test-anim-enter-active'
         ])
         await nextFrame()
         expect(await classList('#container div')).toStrictEqual([
@@ -854,8 +852,8 @@ describe('e2e: Transition', () => {
 
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
-          'test-anim-long-leave-active',
-          'test-anim-long-leave-from'
+          'test-anim-long-leave-from',
+          'test-anim-long-leave-active'
         ])
         await nextFrame()
         expect(await classList('#container div')).toStrictEqual([
@@ -874,8 +872,8 @@ describe('e2e: Transition', () => {
 
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
-          'test-anim-long-enter-active',
-          'test-anim-long-enter-from'
+          'test-anim-long-enter-from',
+          'test-anim-long-enter-active'
         ])
         await nextFrame()
         expect(await classList('#container div')).toStrictEqual([
@@ -934,8 +932,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await svgTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -949,8 +947,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await svgTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -993,8 +991,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1008,8 +1006,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1065,8 +1063,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1084,8 +1082,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1095,6 +1093,227 @@ describe('e2e: Transition', () => {
         ])
         await transitionFinish()
         expect(await html('#container')).toBe('<!--v-if-->')
+      },
+      E2E_TIMEOUT
+    )
+  })
+
+  describe('transition with Suspense', () => {
+    // #1583
+    test(
+      'async component transition inside Suspense',
+      async () => {
+        const onLeaveSpy = jest.fn()
+        const onEnterSpy = jest.fn()
+
+        await page().exposeFunction('onLeaveSpy', onLeaveSpy)
+        await page().exposeFunction('onEnterSpy', onEnterSpy)
+
+        await page().evaluate(() => {
+          const { onEnterSpy, onLeaveSpy } = window as any
+          const { createApp, ref, h } = (window as any).Vue
+          createApp({
+            template: `
+            <div id="container">
+              <transition @enter="onEnterSpy" @leave="onLeaveSpy">
+                <Suspense>
+                  <Comp v-if="toggle" class="test">content</Comp>
+                </Suspense>
+              </transition>
+            </div>
+            <button id="toggleBtn" @click="click">button</button>
+          `,
+            components: {
+              Comp: {
+                async setup() {
+                  return () => h('div', { class: 'test' }, 'content')
+                }
+              }
+            },
+            setup: () => {
+              const toggle = ref(true)
+              const click = () => (toggle.value = !toggle.value)
+              return { toggle, click, onEnterSpy, onLeaveSpy }
+            }
+          }).mount('#app')
+        })
+
+        expect(onEnterSpy).toBeCalledTimes(1)
+        await nextFrame()
+        expect(await html('#container')).toBe(
+          '<div class="test v-enter-active v-enter-to">content</div>'
+        )
+        await transitionFinish()
+        expect(await html('#container')).toBe('<div class="test">content</div>')
+
+        // leave
+        expect(await classWhenTransitionStart()).toStrictEqual([
+          'test',
+          'v-leave-from',
+          'v-leave-active'
+        ])
+        expect(onLeaveSpy).toBeCalledTimes(1)
+        await nextFrame()
+        expect(await classList('.test')).toStrictEqual([
+          'test',
+          'v-leave-active',
+          'v-leave-to'
+        ])
+        await transitionFinish()
+        expect(await html('#container')).toBe('<!--v-if-->')
+
+        // enter
+        const enterClass = await page().evaluate(async () => {
+          (document.querySelector('#toggleBtn') as any)!.click()
+          // nextTrick for patch start
+          await Promise.resolve()
+          // nextTrick for Suspense resolve
+          await Promise.resolve()
+          // nextTrick for dom transition start
+          await Promise.resolve()
+          return document
+            .querySelector('#container div')!
+            .className.split(/\s+/g)
+        })
+        expect(enterClass).toStrictEqual([
+          'test',
+          'v-enter-from',
+          'v-enter-active'
+        ])
+        expect(onEnterSpy).toBeCalledTimes(2)
+        await nextFrame()
+        expect(await classList('.test')).toStrictEqual([
+          'test',
+          'v-enter-active',
+          'v-enter-to'
+        ])
+        await transitionFinish()
+        expect(await html('#container')).toBe('<div class="test">content</div>')
+      },
+      E2E_TIMEOUT
+    )
+
+    // #1689
+    test(
+      'static node transition inside Suspense',
+      async () => {
+        await page().evaluate(() => {
+          const { createApp, ref } = (window as any).Vue
+          createApp({
+            template: `
+            <div id="container">
+              <transition>
+                <Suspense>
+                  <div v-if="toggle" class="test">content</div>
+                </Suspense>
+              </transition>
+            </div>
+            <button id="toggleBtn" @click="click">button</button>
+          `,
+            setup: () => {
+              const toggle = ref(true)
+              const click = () => (toggle.value = !toggle.value)
+              return { toggle, click }
+            }
+          }).mount('#app')
+        })
+        expect(await html('#container')).toBe('<div class="test">content</div>')
+
+        // leave
+        expect(await classWhenTransitionStart()).toStrictEqual([
+          'test',
+          'v-leave-from',
+          'v-leave-active'
+        ])
+        await nextFrame()
+        expect(await classList('.test')).toStrictEqual([
+          'test',
+          'v-leave-active',
+          'v-leave-to'
+        ])
+        await transitionFinish()
+        expect(await html('#container')).toBe('<!--v-if-->')
+
+        // enter
+        expect(await classWhenTransitionStart()).toStrictEqual([
+          'test',
+          'v-enter-from',
+          'v-enter-active'
+        ])
+        await nextFrame()
+        expect(await classList('.test')).toStrictEqual([
+          'test',
+          'v-enter-active',
+          'v-enter-to'
+        ])
+        await transitionFinish()
+        expect(await html('#container')).toBe('<div class="test">content</div>')
+      },
+      E2E_TIMEOUT
+    )
+
+    test(
+      'out-in mode with Suspense',
+      async () => {
+        const onLeaveSpy = jest.fn()
+        const onEnterSpy = jest.fn()
+
+        await page().exposeFunction('onLeaveSpy', onLeaveSpy)
+        await page().exposeFunction('onEnterSpy', onEnterSpy)
+
+        await page().evaluate(() => {
+          const { createApp, shallowRef, h } = (window as any).Vue
+          const One = {
+            async setup() {
+              return () => h('div', { class: 'test' }, 'one')
+            }
+          }
+          const Two = {
+            async setup() {
+              return () => h('div', { class: 'test' }, 'two')
+            }
+          }
+          createApp({
+            template: `
+              <div id="container">
+                <transition mode="out-in">
+                  <Suspense>
+                    <component :is="view"/>
+                  </Suspense>
+                </transition>
+              </div>
+              <button id="toggleBtn" @click="click">button</button>
+            `,
+            setup: () => {
+              const view = shallowRef(One)
+              const click = () => {
+                view.value = view.value === One ? Two : One
+              }
+              return { view, click }
+            }
+          }).mount('#app')
+        })
+
+        await nextFrame()
+        expect(await html('#container')).toBe(
+          '<div class="test v-enter-active v-enter-to">one</div>'
+        )
+        await transitionFinish()
+        expect(await html('#container')).toBe('<div class="test">one</div>')
+
+        // leave
+        await classWhenTransitionStart()
+        await nextFrame()
+        expect(await html('#container')).toBe(
+          '<div class="test v-leave-active v-leave-to">one</div>'
+        )
+        await transitionFinish()
+        await nextFrame()
+        expect(await html('#container')).toBe(
+          '<div class="test v-enter-active v-enter-to">two</div>'
+        )
+        await transitionFinish()
+        expect(await html('#container')).toBe('<div class="test">two</div>')
       },
       E2E_TIMEOUT
     )
@@ -1128,8 +1347,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1143,8 +1362,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1224,8 +1443,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         expect(beforeLeaveSpy).toBeCalled()
         expect(onLeaveSpy).toBeCalled()
@@ -1244,8 +1463,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         expect(beforeEnterSpy).toBeCalled()
         expect(onEnterSpy).toBeCalled()
@@ -1297,8 +1516,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1310,8 +1529,8 @@ describe('e2e: Transition', () => {
         // cancel (enter)
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         expect(onLeaveCancelledSpy).toBeCalled()
         await nextFrame()
@@ -1359,8 +1578,8 @@ describe('e2e: Transition', () => {
         // appear
         expect(appearClass).toStrictEqual([
           'test',
-          'test-appear-active',
-          'test-appear-from'
+          'test-appear-from',
+          'test-appear-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1374,8 +1593,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1389,8 +1608,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1451,8 +1670,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1466,8 +1685,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1507,8 +1726,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1522,8 +1741,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1563,8 +1782,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1578,8 +1797,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1622,8 +1841,8 @@ describe('e2e: Transition', () => {
         // leave
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-leave-active',
-          'test-leave-from'
+          'test-leave-from',
+          'test-leave-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1637,8 +1856,8 @@ describe('e2e: Transition', () => {
         // enter
         expect(await classWhenTransitionStart()).toStrictEqual([
           'test',
-          'test-enter-active',
-          'test-enter-from'
+          'test-enter-from',
+          'test-enter-active'
         ])
         await nextFrame()
         expect(await classList('.test')).toStrictEqual([
@@ -1652,7 +1871,41 @@ describe('e2e: Transition', () => {
       E2E_TIMEOUT
     )
 
-    // fixme
-    test.todo('warn invalid durations')
+    test(
+      'warn invalid durations',
+      async () => {
+        createApp({
+          template: `
+            <div id="container">
+              <transition name="test" :duration="NaN">
+                <div class="test">content</div>
+              </transition>
+            </div>
+          `
+        }).mount(document.createElement('div'))
+        expect(
+          `[Vue warn]: <transition> explicit duration is NaN - ` +
+            'the duration expression might be incorrect.'
+        ).toHaveBeenWarned()
+
+        createApp({
+          template: `
+            <div id="container">
+              <transition name="test" :duration="{
+                enter: {},
+                leave: {}
+              }">
+                <div class="test">content</div>
+              </transition>
+            </div>
+          `
+        }).mount(document.createElement('div'))
+        expect(
+          `[Vue warn]: <transition> explicit duration is not a valid number - ` +
+            `got ${JSON.stringify({})}`
+        ).toHaveBeenWarned()
+      },
+      E2E_TIMEOUT
+    )
   })
 })

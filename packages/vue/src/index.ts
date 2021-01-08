@@ -5,8 +5,11 @@ import { compile, CompilerOptions, CompilerError } from '@vue/compiler-dom'
 import { registerRuntimeCompiler, RenderFunction, warn } from '@vue/runtime-dom'
 import * as runtimeDom from '@vue/runtime-dom'
 import { isString, NOOP, generateCodeFrame, extend } from '@vue/shared'
+import { InternalRenderFunction } from 'packages/runtime-core/src/component'
 
-__DEV__ && initDev()
+if (__DEV__ || __FEATURE_PROD_DEVTOOLS__) {
+  initDev()
+}
 
 const compileCache: Record<string, RenderFunction> = Object.create(null)
 
@@ -74,6 +77,10 @@ function compileToFunction(
   const render = (__GLOBAL__
     ? new Function(code)()
     : new Function('Vue', code)(runtimeDom)) as RenderFunction
+
+  // mark the function as runtime compiled
+  ;(render as InternalRenderFunction)._rc = true
+
   return (compileCache[key] = render)
 }
 
